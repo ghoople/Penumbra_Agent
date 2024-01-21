@@ -33,10 +33,11 @@ int position = 0; // Position of the motor, received from clear core
 int position_old = 0; // Previous position
 
 // DMX Variables
-int channels = 4;
-int HalogenA_DmxChan = 2;
-int brightnessA = 0; // Brightness for the halogen bulb, received from clear core
+int channels = 4; // Number of DMX Channels on my system (probably 4)
+int HalogenA_DmxChan = 2; // Where the Halogen A bulb is plugged in. 
+int brightnessA = 0; // Brightness for the halogen A bulb, received from clear core
 int brightnesA_old = 0; // Previous brightness
+// Probably will want to add brightness B here. 
 
 // Software Serial Variables
 #define baudRate 9600
@@ -46,9 +47,7 @@ SoftwareSerial mySerial =  SoftwareSerial(serRxPin, serTxPin);
 void setup() {
 
   // LED Setup
-    Serial.begin(9600); // opens serial port, sets data rate to 9600 bps
     FastLED.addLeds<WS2812, ledPin, GRB>(leds, numLeds); // Set up FastLED, need to adapt to whatever LED string I buy. 
-
 
   // DMX Setup
     // Set the DMX to Principal (Master) mode
@@ -62,8 +61,8 @@ void setup() {
     DmxSimple.maxChannel(channels);
 
   // Serial Coms
-    mySerial.begin(baudRate);
-    Serial.begin(baudRate);
+    mySerial.begin(baudRate); // Software Serial
+    Serial.begin(baudRate); // Hardware Serial on USB port
     uint32_t serTimeout = 5000;
     uint32_t serStartTime = millis();
     while (!mySerial && !Serial && millis() - serStartTime < serTimeout) {
