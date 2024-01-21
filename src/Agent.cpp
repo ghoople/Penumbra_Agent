@@ -6,6 +6,8 @@ It will:
 1. Receive data from the clear core
 2. Drive the LEDs in the control tower. 
 3. Control the brightness of the tower lights using DMX
+
+Adding a new comment
 */ 
 
 // Dependencies
