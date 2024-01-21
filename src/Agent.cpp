@@ -4,10 +4,9 @@ This code will run on an agent Arduino connected via UART TTL with the clear cor
 
 It will: 
 1. Receive data from the clear core
-2. Drive the LEDs in the control tower. 
-3. Control the brightness of the tower lights using DMX
+2. Generate signals for the LEDs in the control tower. 
+3. Control the brightness of the halogen lights using DMX
 
-Adding a new comment
 */ 
 
 // Dependencies
@@ -93,16 +92,22 @@ void loop() {
   if (position != position_old) {
     
     fill_solid(leds, numLeds, CRGB::Black); // Set the LED array to all black
-    leds[ledIndex] = CRGB::White; // Set the LED at the current index to white
+    leds[ledIndex] = CRGB::White; // Set the LED at the current position to white
 
     // Show the updated LED colors
     FastLED.show();
+
+    Serial.print("New Position Received: ");
+    Serial.println(brightnessA);
   }
 
   // Update the led show only when you receive data:
   if (brightnessA != brightnesA_old) {
     
     DmxSimple.write(HalogenA_DmxChan, brightnessA);
+
+    Serial.print("New Brightness Received: ");
+    Serial.println(brightnessA);
 
   }
 
