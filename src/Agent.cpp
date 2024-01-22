@@ -19,16 +19,15 @@ It will:
 // 0 Should not be used, reserved for USB Coms
 // 1 Sould not be used, reserved for USB Coms
 #define dmxDePin 2 // Must be pin 2 based on board.
-//#define dmxRxPin 3 // Must be pin 2 based on board. (I don't need this one)
-#define dmxTxPin 4 // Must be pin 4 based on jumpers
-#define ledPin 6  // Define the pin to which the LED strip is connected
+//#define dmxRxPin 3 // Must be pin 2 based on board. (I don't need to use this one in transmit only mode, but can't use for other stuff)
+#define dmxTxPin 4 // Must be pin 4 based on jumpers on the DMX board
+#define ledPin 6  // Defines the pin to which the LED strip is connected
 #define serRxPin 7 // Software Serial
 #define serTxPin 8 // Software Serial
 
 
-// LED Variables
+// Initialize LED Variables
 #define numLeds 144 // Define the number of LEDs on the strip
-int ledIndex = 0; // for incoming serial data from the ClearCore
 CRGB leds[numLeds]; // An array of CRGB colors to pass to the strip. 
 int position = 0; // Position of the motor, received from clear core
 int position_old = 0; // Previous position
@@ -70,7 +69,6 @@ void setup() {
         continue;
     }
     Serial.println("<Setup complete>");
-    
 }
 
 void loop() {
@@ -92,7 +90,7 @@ void loop() {
   if (position != position_old) {
     
     fill_solid(leds, numLeds, CRGB::Black); // Set the LED array to all black
-    leds[ledIndex] = CRGB::White; // Set the LED at the current position to white
+    leds[position] = CRGB::White; // Set the LED at the current position to white
 
     // Show the updated LED colors
     FastLED.show();
@@ -101,7 +99,7 @@ void loop() {
     Serial.println(brightnessA);
   }
 
-  // Update the led show only when you receive data:
+  // Update the halogen brightness only when you receive new data:
   if (brightnessA != brightnesA_old) {
     
     DmxSimple.write(HalogenA_DmxChan, brightnessA);
