@@ -39,10 +39,10 @@ int brightnessA = 0; // Brightness for the halogen A bulb, received from clear c
 int brightnesA_old = 0; // Previous brightness
 // Probably will want to add brightness B here. 
 
-// Software Serial Variables
-#define baudRate 9600
+// Serial Coms Variables
+#define principalBaudRate 28800 // May need to go faster to keep up with updates from clear core? 
+#define usbBaudRate 9600 // This can be slow.  
 SoftwareSerial mySerial =  SoftwareSerial(serRxPin, serTxPin);
-
 
 void setup() {
 
@@ -61,8 +61,8 @@ void setup() {
     DmxSimple.maxChannel(channels);
 
   // Serial Coms
-    mySerial.begin(baudRate); // Software Serial
-    Serial.begin(baudRate); // Hardware Serial on USB port
+    mySerial.begin(principalBaudRate); // Software Serial
+    Serial.begin(usbBaudRate); // Hardware Serial on USB port
     uint32_t serTimeout = 5000;
     uint32_t serStartTime = millis();
     while (!mySerial && !Serial && millis() - serStartTime < serTimeout) {
