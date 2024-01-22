@@ -30,6 +30,7 @@ It will:
 #define numLeds 144 // Define the number of LEDs on the strip
 CRGB leds[numLeds]; // An array of CRGB colors to pass to the strip. 
 int position = 0; // Position of the motor, received from clear core
+int showNum = 0; // Show number, received from clear core. 
 int position_old = 0; // Previous position
 
 // DMX Variables
@@ -80,10 +81,10 @@ void loop() {
     String message = mySerial.readStringUntil('\n'); 
     Serial.println("Received Message");
     // Parse the message into two integers separated by a comma
-    sscanf(message.c_str(), "%d,%d", &position, &brightnessA);
+    sscanf(message.c_str(), "%d,%d", &position, &showNum);
     Serial.print(position);
     Serial.print(" and ");
-    Serial.println(brightnessA);
+    Serial.println(showNum);
   }
   
   // Update the led show only when you receive data:
