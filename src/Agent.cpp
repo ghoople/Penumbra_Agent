@@ -35,9 +35,9 @@ int position_old = 0; // Previous position
 
 // DMX Variables
 int channels = 4; // Number of DMX Channels on my system (probably 4)
-int HalogenA_DmxChan = 2; // Where the Halogen A bulb is plugged in. 
-int brightnessA = 0; // Brightness for the halogen A bulb, received from clear core
-int brightnesA_old = 0; // Previous brightness
+int halogenA_DmxChan = 2; // Where the Halogen A bulb is plugged in. 
+int brightA = 0; // Brightness for the halogen A bulb, received from clear core
+int brightA_old = 0; // Previous brightness
 // Probably will want to add brightness B here. 
 
 // Serial Coms Variables
@@ -97,22 +97,22 @@ void loop() {
     FastLED.show();
 
     Serial.print("New Position Received: ");
-    Serial.println(brightnessA);
+    Serial.println(brightA);
   }
 
   // Update the halogen brightness only when you receive new data:
-  if (brightnessA != brightnesA_old) {
+  if (brightA != brightA_old) {
     
-    DmxSimple.write(HalogenA_DmxChan, brightnessA);
+    DmxSimple.write(halogenA_DmxChan, brightA);
 
     Serial.print("New Brightness Received: ");
-    Serial.println(brightnessA);
+    Serial.println(brightA);
 
   }
 
   // Add Code for brightness2 if we go that route. 
 
-  brightnesA_old = brightnessA;
+  brightA_old = brightA;
   position_old = position; 
 
 }
