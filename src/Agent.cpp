@@ -15,11 +15,15 @@ It will:
 #include <DmxSimple.h>
 #include <SoftwareSerial.h>
 
+// For Debugging Only
+#include "avr8-stub.h"
+
+
 // Define Hardware Pins
 // 0 Should not be used, reserved for USB Coms
 // 1 Sould not be used, reserved for USB Coms
 #define dmxDePin 2 // Must be pin 2 based on board.
-//#define dmxRxPin 3 // Must be pin 2 based on board. (I don't need to use this one in transmit only mode, but can't use for other stuff)
+//#define dmxRxPin 3 // I don't need to use this pin in transmit only mode. Signals from shield might conflict with the debugger.  
 #define dmxTxPin 4 // Must be pin 4 based on jumpers on the DMX board
 #define ledPin 6  // Defines the pin to which the LED strip is connected
 #define serRxPin 7 // Software Serial
@@ -46,6 +50,8 @@ int brightA_old = 0; // Previous brightness
 SoftwareSerial mySerial =  SoftwareSerial(serRxPin, serTxPin);
 
 void setup() {
+  //When Debugging, use this: 
+  debug_init();
 
   // LED Setup
     FastLED.addLeds<WS2812, ledPin, GRB>(leds, numLeds); // Set up FastLED, need to adapt to whatever LED string I buy. 
@@ -63,13 +69,14 @@ void setup() {
 
   // Serial Coms
     mySerial.begin(principalBaudRate); // Software Serial
-    Serial.begin(usbBaudRate); // Hardware Serial on USB port
+    //Serial.begin(usbBaudRate); // Hardware Serial on USB port
     uint32_t serTimeout = 5000;
     uint32_t serStartTime = millis();
-    while (!mySerial && !Serial && millis() - serStartTime < serTimeout) {
-        continue;
+    //while (!mySerial && !Serial && millis() - serStartTime < serTimeout) {
+    while (!mySerial && millis() - serStartTime < serTimeout) {
+            continue;
     }
-    Serial.println("<Setup complete>");
+    //Serial.println("<Setup complete>");
 }
 
 void loop() {
@@ -79,12 +86,12 @@ void loop() {
   if (mySerial.available() > 0) {
     // Read the incoming message until a newline character is received
     String message = mySerial.readStringUntil('\n'); 
-    Serial.println("Received Message");
+    //Serial.println("Received Message");
     // Parse the message into two integers separated by a comma
     sscanf(message.c_str(), "%d,%d", &position, &showNum);
-    Serial.print(position);
-    Serial.print(" and ");
-    Serial.println(showNum);
+    //Serial.print(position);
+    //Serial.print(" and ");
+    //Serial.println(showNum);
   }
   
   // Update the led show only when you receive data:
@@ -96,8 +103,8 @@ void loop() {
     // Show the updated LED colors
     FastLED.show();
 
-    Serial.print("New Position Received: ");
-    Serial.println(brightA);
+    //Serial.print("New Position Received: ");
+    //Serial.println(brightA);
   }
 
   // Update the halogen brightness only when you receive new data:
@@ -105,8 +112,8 @@ void loop() {
     
     DmxSimple.write(halogenA_DmxChan, brightA);
 
-    Serial.print("New Brightness Received: ");
-    Serial.println(brightA);
+    //Serial.print("New Brightness Received: ");
+    //Serial.println(brightA);
 
   }
 
