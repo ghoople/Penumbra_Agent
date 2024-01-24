@@ -15,6 +15,8 @@ It will:
 #include <DmxSimple.h>
 #include <SoftwareSerial.h>
 
+#define Top 7858 // Must match the definition in Principal's main.h.
+
 // For Debugging Only
 #include "avr8-stub.h"
 
@@ -34,15 +36,16 @@ It will:
 #define numLeds 144 // Define the number of LEDs on the strip
 CRGB leds[numLeds]; // An array of CRGB colors to pass to the strip. 
 int position = 0; // Position of the motor, received from clear core
-int showNum = 0; // Show number, received from clear core. 
 int position_old = 0; // Previous position
 
 // DMX Variables
 int channels = 4; // Number of DMX Channels on my system (probably 4)
 int halogenA_DmxChan = 2; // Where the Halogen A bulb is plugged in. 
+int halogenB_DmxChan = 3; // Where the Halogen A bulb is plugged in. 
 int brightA = 0; // Brightness for the halogen A bulb, received from clear core
 int brightA_old = 0; // Previous brightness
-// Probably will want to add brightness B here. 
+int brightB = 0; // Brightness for the halogen A bulb, received from clear core
+int brightB_old = 0; // Previous brightness
 
 // Serial Coms Variables
 #define principalBaudRate 28800 // May need to go faster to keep up with updates from clear core? 
@@ -88,15 +91,18 @@ void loop() {
     String message = mySerial.readStringUntil('\n'); 
     //Serial.println("Received Message");
     // Parse the message into two integers separated by a comma
-    sscanf(message.c_str(), "%d,%d", &position, &showNum);
-    //Serial.print(position);
-    //Serial.print(" and ");
-    //Serial.println(showNum);
+    sscanf(message.c_str(), "%d,%d,%d", &position, &brightA, &brightB);
   }
   
   // Update the led show only when you receive data:
   if (position != position_old) {
     
+    // FINISH THIS LOGIC
+
+    // Convert the position data into the correct LED
+    ledApos = position/Top * numLeds;
+    //ledBpos = 
+
     fill_solid(leds, numLeds, CRGB::Black); // Set the LED array to all black
     leds[position] = CRGB::White; // Set the LED at the current position to white
 
@@ -117,9 +123,19 @@ void loop() {
 
   }
 
+  // Update the halogen brightness only when you receive new data:
+  if (brightB != brightB_old) {
+    
+    DmxSimple.write(halogenB_DmxChan, brightB);
+
+    //Serial.print("New Brightness Received: ");
+    //Serial.println(brightA);
+
+  }
   // Add Code for brightness2 if we go that route. 
 
   brightA_old = brightA;
+  brightB_old = brightB;
   position_old = position; 
 
 }
