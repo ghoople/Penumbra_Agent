@@ -100,7 +100,7 @@ void loop() {
     // FINISH THIS LOGIC
 
     // Convert the position data into the correct LED
-    ledApos = position/Top * numLeds;
+    //ledApos = position/Top * numLeds;
     //ledBpos = 
 
     fill_solid(leds, numLeds, CRGB::Black); // Set the LED array to all black
