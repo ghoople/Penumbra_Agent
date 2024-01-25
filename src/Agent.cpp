@@ -37,21 +37,19 @@ int ledBpos;
 
 // DMX Variables
 int channels = 4; // Number of DMX Channels on my system (probably 4)
-int halogenA_DmxChan = 2; // Where the Halogen A bulb is plugged in. 
-int halogenB_DmxChan = 3; // Where the Halogen A bulb is plugged in. 
+int halogenA_DmxChan = 1; // Where the Halogen A bulb is plugged in. 
+int halogenB_DmxChan = 2; // Where the Halogen B bulb is plugged in. 
 int brightA = 0; // Brightness for the halogen A bulb, received from clear core
 int brightA_old = 0; // Previous brightness
 int brightB = 0; // Brightness for the halogen A bulb, received from clear core
 int brightB_old = 0; // Previous brightness
 
 // Serial Coms Variables
-#define principalBaudRate 28800 // May need to go faster to keep up with updates from clear core? 
+#define principalBaudRate 9600 // May need to go faster to keep up with updates from clear core? 
 #define usbBaudRate 9600 // This can be slow.  
 SoftwareSerial mySerial =  SoftwareSerial(serRxPin, serTxPin);
 
 void setup() {
-  //When Debugging, use this: 
-  //debug_init();
 
   // LED Setup
     FastLED.addLeds<WS2812, ledPin, GRB>(leds, numLeds); // Set up FastLED, need to adapt to whatever LED string I buy. 
@@ -75,7 +73,7 @@ void setup() {
     while (!mySerial && !Serial && millis() - serStartTime < serTimeout) {
             continue;
     }
-    Serial.println("<Setup complete>");
+    Serial.println("Setup complete");
 }
 
 void loop() {
@@ -83,9 +81,15 @@ void loop() {
   if (mySerial.available() > 0) {
     // Read the incoming message until a newline character is received
     String message = mySerial.readStringUntil('\n'); 
-    Serial.println("Received Message");
     // Parse the message into two integers separated by a comma
     sscanf(message.c_str(), "%d,%d,%d", &position, &brightA, &brightB);
+    //Serial.println("Parsed as: position: " + String(position) + ", brightA: " + String(brightA) + ", brightB: " + String(brightB));
+    Serial.print("Update:");
+    Serial.print(position); // Tell the Agent where the light is. 
+    Serial.print(","); 
+    Serial.print(brightA);// Tell the agent what the intensity should be for halA
+    Serial.print(","); 
+    Serial.println(brightB);// Tell the agent what the intensity should be for halB
   }
   
   // Update the led show only when you receive data:
@@ -94,7 +98,7 @@ void loop() {
     ledApos = round(position/Top * numLeds);
     ledBpos = round((1-position/Top) * numLeds);
 
-    Serial.println("ledApos: " + String(ledApos) + ", ledBpos: " + String(ledBpos));
+    //Serial.println("ledApos: " + String(ledApos) + ", ledBpos: " + String(ledBpos));
 
     fill_solid(leds, numLeds, CRGB::Black); // Set the LED array to all black
     leds[ledApos] = CRGB(brightA,brightA,brightA); // Set the LED at the current position to white at whatever brightness is commanded
@@ -109,7 +113,7 @@ void loop() {
     
     DmxSimple.write(halogenA_DmxChan, brightA);
 
-    Serial.println("Set halogenA Brightness: " + brightA);
+    //Serial.println("Set halogenA Brightness: " + brightA);
   }
 
   // Update the halogen brightness only when you receive new data:
@@ -117,7 +121,7 @@ void loop() {
     
     DmxSimple.write(halogenB_DmxChan, brightB);
 
-    Serial.println("Set halogenB Brightness: " + brightB);
+    //Serial.println("Set halogenB Brightness: " + brightB);
   }
 
   brightA_old = brightA;
