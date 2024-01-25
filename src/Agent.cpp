@@ -54,7 +54,7 @@ SoftwareSerial mySerial =  SoftwareSerial(serRxPin, serTxPin);
 
 void setup() {
   //When Debugging, use this: 
-  debug_init();
+  //debug_init();
 
   // LED Setup
     FastLED.addLeds<WS2812, ledPin, GRB>(leds, numLeds); // Set up FastLED, need to adapt to whatever LED string I buy. 
