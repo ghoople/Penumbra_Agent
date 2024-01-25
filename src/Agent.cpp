@@ -17,10 +17,6 @@ It will:
 
 #define Top 7858 // Must match the definition in Principal's main.h.
 
-// For Debugging Only
-#include "avr8-stub.h"
-
-
 // Define Hardware Pins
 // 0 Should not be used, reserved for USB Coms
 // 1 Sould not be used, reserved for USB Coms
@@ -31,12 +27,13 @@ It will:
 #define serRxPin 7 // Software Serial
 #define serTxPin 8 // Software Serial
 
-
 // Initialize LED Variables
 #define numLeds 144 // Define the number of LEDs on the strip
 CRGB leds[numLeds]; // An array of CRGB colors to pass to the strip. 
 int position = 0; // Position of the motor, received from clear core
 int position_old = 0; // Previous position
+int ledApos;
+int ledBpos;
 
 // DMX Variables
 int channels = 4; // Number of DMX Channels on my system (probably 4)
@@ -72,45 +69,39 @@ void setup() {
 
   // Serial Coms
     mySerial.begin(principalBaudRate); // Software Serial
-    //Serial.begin(usbBaudRate); // Hardware Serial on USB port
+    Serial.begin(usbBaudRate); // Hardware Serial on USB port
     uint32_t serTimeout = 5000;
     uint32_t serStartTime = millis();
-    //while (!mySerial && !Serial && millis() - serStartTime < serTimeout) {
-    while (!mySerial && millis() - serStartTime < serTimeout) {
+    while (!mySerial && !Serial && millis() - serStartTime < serTimeout) {
             continue;
     }
-    //Serial.println("<Setup complete>");
+    Serial.println("<Setup complete>");
 }
 
 void loop() {
-  
   // Check for new data: 
-
   if (mySerial.available() > 0) {
     // Read the incoming message until a newline character is received
     String message = mySerial.readStringUntil('\n'); 
-    //Serial.println("Received Message");
+    Serial.println("Received Message");
     // Parse the message into two integers separated by a comma
     sscanf(message.c_str(), "%d,%d,%d", &position, &brightA, &brightB);
   }
   
   // Update the led show only when you receive data:
   if (position != position_old) {
-    
-    // FINISH THIS LOGIC
+    // Convert the position data into the correct LED index
+    ledApos = round(position/Top * numLeds);
+    ledBpos = round((1-position/Top) * numLeds);
 
-    // Convert the position data into the correct LED
-    //ledApos = position/Top * numLeds;
-    //ledBpos = 
+    Serial.println("ledApos: " + String(ledApos) + ", ledBpos: " + String(ledBpos));
 
     fill_solid(leds, numLeds, CRGB::Black); // Set the LED array to all black
-    leds[position] = CRGB::White; // Set the LED at the current position to white
+    leds[ledApos] = CRGB(brightA,brightA,brightA); // Set the LED at the current position to white at whatever brightness is commanded
+    leds[ledBpos] = CRGB(brightB,brightB,brightB);; // Set the LED at the current position to white
 
     // Show the updated LED colors
     FastLED.show();
-
-    //Serial.print("New Position Received: ");
-    //Serial.println(brightA);
   }
 
   // Update the halogen brightness only when you receive new data:
@@ -118,9 +109,7 @@ void loop() {
     
     DmxSimple.write(halogenA_DmxChan, brightA);
 
-    //Serial.print("New Brightness Received: ");
-    //Serial.println(brightA);
-
+    Serial.println("Set halogenA Brightness: " + brightA);
   }
 
   // Update the halogen brightness only when you receive new data:
@@ -128,11 +117,8 @@ void loop() {
     
     DmxSimple.write(halogenB_DmxChan, brightB);
 
-    //Serial.print("New Brightness Received: ");
-    //Serial.println(brightA);
-
+    Serial.println("Set halogenB Brightness: " + brightB);
   }
-  // Add Code for brightness2 if we go that route. 
 
   brightA_old = brightA;
   brightB_old = brightB;
