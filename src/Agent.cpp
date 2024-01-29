@@ -9,6 +9,8 @@ It will:
 
 */ 
 
+bool debug = true; // Set to true to print debug messages to the serial monitor.
+
 // Dependencies
 #include <Arduino.h>
 #include <FastLED.h>
@@ -50,7 +52,6 @@ int brightB_old = 0; // Previous brightness
 SoftwareSerial mySerial =  SoftwareSerial(serRxPin, serTxPin);
 
 void setup() {
-
   // LED Setup
     FastLED.addLeds<WS2812, ledPin, GRB>(leds, numLeds); // Set up FastLED, need to adapt to whatever LED string I buy. 
 
@@ -73,7 +74,7 @@ void setup() {
     while (!mySerial && !Serial && millis() - serStartTime < serTimeout) {
             continue;
     }
-    Serial.println("Setup complete");
+    if(debug){Serial.println("Setup complete");}
 }
 
 void loop() {
@@ -84,12 +85,14 @@ void loop() {
     // Parse the message into two integers separated by a comma
     sscanf(message.c_str(), "%d,%d,%d", &position, &brightA, &brightB);
     //Serial.println("Parsed as: position: " + String(position) + ", brightA: " + String(brightA) + ", brightB: " + String(brightB));
-    Serial.print("Update:");
-    Serial.print(position); // Tell the Agent where the light is. 
-    Serial.print(","); 
-    Serial.print(brightA);// Tell the agent what the intensity should be for halA
-    Serial.print(","); 
-    Serial.println(brightB);// Tell the agent what the intensity should be for halB
+    if(debug){
+      Serial.print("Rx:");
+      Serial.print(position); // Tell the Agent where the light is. 
+      Serial.print(","); 
+      Serial.print(brightA);// Tell the agent what the intensity should be for halA
+      Serial.print(","); 
+      Serial.println(brightB);// Tell the agent what the intensity should be for halB
+    }
   }
   
   // Update the led show only when you receive data:
