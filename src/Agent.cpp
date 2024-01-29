@@ -38,6 +38,7 @@ int ledApos;
 int ledBpos;
 
 // DMX Variables
+// Set DMX module to master mode
 int channels = 4; // Number of DMX Channels on my system (probably 4)
 int halogenA_DmxChan = 1; // Where the Halogen A bulb is plugged in. 
 int halogenB_DmxChan = 2; // Where the Halogen B bulb is plugged in. 
@@ -111,12 +112,13 @@ void loop() {
     FastLED.show();
   }
 
+
   // Update the halogen brightness only when you receive new data:
   if (brightA != brightA_old) {
     
     DmxSimple.write(halogenA_DmxChan, brightA);
 
-    //Serial.println("Set halogenA Brightness: " + brightA);
+    Serial.println("Set halogenA Brightness: " + String(brightA));
   }
 
   // Update the halogen brightness only when you receive new data:
@@ -124,7 +126,7 @@ void loop() {
     
     DmxSimple.write(halogenB_DmxChan, brightB);
 
-    //Serial.println("Set halogenB Brightness: " + brightB);
+    Serial.println("Set halogenB Brightness: " + String(brightB));
   }
 
   brightA_old = brightA;
