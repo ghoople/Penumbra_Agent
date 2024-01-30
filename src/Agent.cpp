@@ -52,6 +52,10 @@ int brightB_old = 0; // Previous brightness
 #define usbBaudRate 9600 // This can be slow.  
 SoftwareSerial mySerial =  SoftwareSerial(serRxPin, serTxPin);
 
+// Timer Variables
+int32_t lastUpdateTime = millis();
+int32_t updateInterval = 500; // How often to update the LED show.
+
 void setup() {
   // LED Setup
     FastLED.addLeds<WS2812, ledPin, GRB>(leds, numLeds); // Set up FastLED, need to adapt to whatever LED string I buy. 
@@ -95,43 +99,48 @@ void loop() {
       Serial.println(brightB);// Tell the agent what the intensity should be for halB
     }
   }
-  
-  // Update the led show only when you receive data:
-  if (position != position_old) {
-    // Convert the position data into the correct LED index
-    ledApos = round((float)position/Top * numLeds);
-    ledBpos = round((1-(float)position/Top) * numLeds);
 
-    Serial.println("ledApos: " + String(ledApos) + ", ledBpos: " + String(ledBpos));
+  int32_t currentTime = millis();
+// Only process updates every updateInterval ms
+ if (currentTime - lastUpdateTime >= updateInterval) {  
+     // Update the led show only when you receive data:
+    if (position != position_old) {
+      // Convert the position data into the correct LED index
+      ledApos = round((float)position/Top * numLeds);
+      ledBpos = round((1-(float)position/Top) * numLeds);
 
-    fill_solid(leds, numLeds, CRGB::Black); // Set the LED array to all black
-    leds[ledApos] = CRGB(brightA,brightA,brightA); // Set the LED at the current position to white at whatever brightness is commanded
-    leds[ledBpos] = CRGB(brightB,brightB,brightB);; // Set the LED at the current position to white
+      Serial.println("ledApos: " + String(ledApos) + ", ledBpos: " + String(ledBpos));
 
-    // Show the updated LED colors
-    FastLED.show();
-  }
+      fill_solid(leds, numLeds, CRGB::Black); // Set the LED array to all black
+      leds[ledApos] = CRGB(brightA,brightA,brightA); // Set the LED at the current position to white at whatever brightness is commanded
+      leds[ledBpos] = CRGB(brightB,brightB,brightB);; // Set the LED at the current position to white
+
+      // Show the updated LED colors
+      FastLED.show();
+    }
 
 
-  // Update the halogen brightness only when you receive new data:
-  if (brightA != brightA_old) {
+    // Update the halogen brightness only when you receive new data:
+    if (brightA != brightA_old) {
+      
+      DmxSimple.write(halogenA_DmxChan, brightA);
+
+      Serial.println("Set halogenA Brightness: " + String(brightA));
+    }
+
+    // Update the halogen brightness only when you receive new data:
+    if (brightB != brightB_old) {
+      
+      DmxSimple.write(halogenB_DmxChan, brightB);
+
+      Serial.println("Set halogenB Brightness: " + String(brightB));
+    }
+
+    brightA_old = brightA;
+    brightB_old = brightB;
+    position_old = position; 
     
-    DmxSimple.write(halogenA_DmxChan, brightA);
-
-    Serial.println("Set halogenA Brightness: " + String(brightA));
+    lastUpdateTime = millis();
   }
-
-  // Update the halogen brightness only when you receive new data:
-  if (brightB != brightB_old) {
-    
-    DmxSimple.write(halogenB_DmxChan, brightB);
-
-    Serial.println("Set halogenB Brightness: " + String(brightB));
-  }
-
-  brightA_old = brightA;
-  brightB_old = brightB;
-  position_old = position; 
-
 }
 
