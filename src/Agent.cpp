@@ -9,7 +9,7 @@ It will:
 
 */ 
 
-bool debug = true; // Set to true to print debug messages to the serial monitor.
+bool debug = false; // Set to true to print debug messages to the serial monitor.
 
 // Dependencies
 #include <Arduino.h>
@@ -99,10 +99,10 @@ void loop() {
   // Update the led show only when you receive data:
   if (position != position_old) {
     // Convert the position data into the correct LED index
-    ledApos = round(position/Top * numLeds);
-    ledBpos = round((1-position/Top) * numLeds);
+    ledApos = round((float)position/Top * numLeds);
+    ledBpos = round((1-(float)position/Top) * numLeds);
 
-    //Serial.println("ledApos: " + String(ledApos) + ", ledBpos: " + String(ledBpos));
+    Serial.println("ledApos: " + String(ledApos) + ", ledBpos: " + String(ledBpos));
 
     fill_solid(leds, numLeds, CRGB::Black); // Set the LED array to all black
     leds[ledApos] = CRGB(brightA,brightA,brightA); // Set the LED at the current position to white at whatever brightness is commanded
