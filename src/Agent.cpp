@@ -54,7 +54,7 @@ SoftwareSerial mySerial =  SoftwareSerial(serRxPin, serTxPin);
 
 // Timer Variables
 int32_t lastUpdateTime = millis();
-int32_t updateInterval = 500; // How often to update the LED show.
+int32_t updateInterval = 75; // How often to update the LED show.
 
 void setup() {
   // LED Setup
@@ -106,8 +106,11 @@ void loop() {
      // Update the led show only when you receive data:
     if (position != position_old) {
       // Convert the position data into the correct LED index
-      ledApos = round((float)position/Top * numLeds);
-      ledBpos = round((1-(float)position/Top) * numLeds);
+      //ledApos = round((float)position/Top * numLeds);
+      //ledBpos = round((1-(float)position/Top) * numLeds);
+
+      ledApos = map(position, 0, Top, 0, numLeds);
+      ledBpos = numLeds - ledApos;
 
       Serial.println("ledApos: " + String(ledApos) + ", ledBpos: " + String(ledBpos));
 
