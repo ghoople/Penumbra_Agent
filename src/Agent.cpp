@@ -83,7 +83,7 @@ void setup() {
 }
 
 void loop() {
-  // Check for new data: 
+  // Check for new data every loop: 
   if (mySerial.available() > 0) {
     // Read the incoming message until a newline character is received
     String message = mySerial.readStringUntil('\n'); 
@@ -106,29 +106,25 @@ void loop() {
      // Update the led show only when you receive data:
     if (position != position_old) {
       // Convert the position data into the correct LED index
-      //ledApos = round((float)position/Top * numLeds);
-      //ledBpos = round((1-(float)position/Top) * numLeds);
-
-      ledApos = map(position, 0, Top, 0, numLeds);
-      ledBpos = numLeds - ledApos;
+      ledApos = map(position, 0, Top, 0, numLeds - 1); // -1 because the index starts at 0
+      ledBpos = numLeds - 1 - ledApos;
 
       Serial.println("ledApos: " + String(ledApos) + ", ledBpos: " + String(ledBpos));
 
       fill_solid(leds, numLeds, CRGB::Black); // Set the LED array to all black
       leds[ledApos] = CRGB(brightA,brightA,brightA); // Set the LED at the current position to white at whatever brightness is commanded
-      leds[ledBpos] = CRGB(brightB,brightB,brightB);; // Set the LED at the current position to white
+      leds[ledBpos] = CRGB(brightB,brightB,brightB);
 
       // Show the updated LED colors
       FastLED.show();
     }
-
 
     // Update the halogen brightness only when you receive new data:
     if (brightA != brightA_old) {
       
       DmxSimple.write(halogenA_DmxChan, brightA);
 
-      Serial.println("Set halogenA Brightness: " + String(brightA));
+      if(debug){Serial.println("Set halogenA Brightness: " + String(brightA));}
     }
 
     // Update the halogen brightness only when you receive new data:
@@ -136,7 +132,7 @@ void loop() {
       
       DmxSimple.write(halogenB_DmxChan, brightB);
 
-      Serial.println("Set halogenB Brightness: " + String(brightB));
+      if(debug){Serial.println("Set halogenB Brightness: " + String(brightB));}
     }
 
     brightA_old = brightA;
