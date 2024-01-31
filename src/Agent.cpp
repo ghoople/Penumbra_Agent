@@ -109,7 +109,7 @@ void loop() {
       ledApos = map(position, 0, Top, 0, numLeds - 1); // -1 because the index starts at 0
       ledBpos = numLeds - 1 - ledApos;
 
-      Serial.println("ledApos: " + String(ledApos) + ", ledBpos: " + String(ledBpos));
+      if(debug){Serial.println("ledApos: " + String(ledApos) + ", ledBpos: " + String(ledBpos));}
 
       fill_solid(leds, numLeds, CRGB::Black); // Set the LED array to all black
       leds[ledApos] = CRGB(brightA,brightA,brightA); // Set the LED at the current position to white at whatever brightness is commanded
