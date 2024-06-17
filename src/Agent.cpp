@@ -9,11 +9,10 @@ It will:
 
 */ 
 
-bool debug = false; // Set to true to print debug messages to the serial monitor.
+bool debug = true; // Set to true to print debug messages to the serial monitor.
 
 // Dependencies
 #include <Arduino.h>
-#include <FastLED.h>
 #include <DmxSimple.h>
 #include <SoftwareSerial.h>
 
@@ -25,17 +24,11 @@ bool debug = false; // Set to true to print debug messages to the serial monitor
 #define dmxDePin 2 // Must be pin 2 based on board.
 //#define dmxRxPin 3 // I don't need to use this pin in transmit only mode. Signals from shield might conflict with the debugger.  
 #define dmxTxPin 4 // Must be pin 4 based on jumpers on the DMX board
-#define ledPin 6  // Defines the pin to which the LED strip is connected
 #define serRxPin 7 // Software Serial
 #define serTxPin 8 // Software Serial
 
-// Initialize LED Variables
-#define numLeds 144 // Define the number of LEDs on the strip
-CRGB leds[numLeds]; // An array of CRGB colors to pass to the strip. 
 int position = 0; // Position of the motor, received from clear core
 int position_old = 0; // Previous position
-int ledApos;
-int ledBpos;
 
 // DMX Variables
 // Set DMX module to master mode
@@ -54,12 +47,9 @@ SoftwareSerial mySerial =  SoftwareSerial(serRxPin, serTxPin);
 
 // Timer Variables
 int32_t lastUpdateTime = millis();
-int32_t updateInterval = 75; // How often to update the LED show.
+int32_t updateInterval = 75; // How often to update the Halogen Lights.
 
 void setup() {
-  // LED Setup
-    FastLED.addLeds<WS2812, ledPin, GRB>(leds, numLeds); // Set up FastLED, need to adapt to whatever LED string I buy. 
-
   // DMX Setup
     // Set the DMX to Principal (Master) mode
     pinMode(dmxDePin,OUTPUT);
@@ -103,35 +93,15 @@ void loop() {
   int32_t currentTime = millis();
 // Only process updates every updateInterval ms
  if (currentTime - lastUpdateTime >= updateInterval) {  
-     // Update the led show only when you receive data:
-    if (position != position_old) {
-      // Convert the position data into the correct LED index
-      ledApos = map(position, 0, Top, 0, numLeds - 1); // -1 because the index starts at 0
-      ledBpos = numLeds - 1 - ledApos;
-
-      if(debug){Serial.println("ledApos: " + String(ledApos) + ", ledBpos: " + String(ledBpos));}
-
-      fill_solid(leds, numLeds, CRGB::Black); // Set the LED array to all black
-      leds[ledApos] = CRGB(brightA,brightA,brightA); // Set the LED at the current position to white at whatever brightness is commanded
-      leds[ledBpos] = CRGB(brightB,brightB,brightB);
-
-      // Show the updated LED colors
-      FastLED.show();
-    }
-
     // Update the halogen brightness only when you receive new data:
     if (brightA != brightA_old) {
-      
       DmxSimple.write(halogenA_DmxChan, brightA);
-
       if(debug){Serial.println("Set halogenA Brightness: " + String(brightA));}
     }
 
     // Update the halogen brightness only when you receive new data:
     if (brightB != brightB_old) {
-      
       DmxSimple.write(halogenB_DmxChan, brightB);
-
       if(debug){Serial.println("Set halogenB Brightness: " + String(brightB));}
     }
 
