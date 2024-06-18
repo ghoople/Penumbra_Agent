@@ -9,14 +9,14 @@ It will:
 
 */ 
 
-bool debug = true; // Set to true to print debug messages to the serial monitor.
+bool debug = false; // Set to true to print debug messages to the serial monitor.
 
 // Dependencies
 #include <Arduino.h>
 #include <DmxSimple.h>
 #include <SoftwareSerial.h>
 
-#define Top 7858 // Must match the definition in Principal's main.h.
+#define Top 12036 // Should match the definition in Principal's main.h, but isn't being used now that we got rid of the LEDs. 
 
 // Define Hardware Pins
 // 0 Should not be used, reserved for USB Coms
@@ -79,7 +79,6 @@ void loop() {
     String message = mySerial.readStringUntil('\n'); 
     // Parse the message into two integers separated by a comma
     sscanf(message.c_str(), "%d,%d,%d", &position, &brightA, &brightB);
-    //Serial.println("Parsed as: position: " + String(position) + ", brightA: " + String(brightA) + ", brightB: " + String(brightB));
     if(debug){
       Serial.print("Rx:");
       Serial.print(position); // Tell the Agent where the light is. 
