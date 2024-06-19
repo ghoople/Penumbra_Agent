@@ -16,7 +16,7 @@ bool debug = false; // Set to true to print debug messages to the serial monitor
 #include <DmxSimple.h>
 #include <SoftwareSerial.h>
 
-#define Top 12036 // Should match the definition in Principal's main.h, but isn't being used now that we got rid of the LEDs. 
+#define Top 11732 // Should match the definition in Principal's main.h, but isn't being used now that we got rid of the LEDs. 
 
 // Define Hardware Pins
 // 0 Should not be used, reserved for USB Coms
